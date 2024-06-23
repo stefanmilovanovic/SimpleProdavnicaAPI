@@ -26,4 +26,41 @@ public class ProizvodController:ControllerBase{
         var proizvodDTO = proizvod.ProizvodUGetDTO();
         return Ok(proizvodDTO);
     }
+    [HttpPost]
+    public async Task<IActionResult> DodajProizvod([FromBody] ProizvodPostDTO proizvodPostDTO){
+        if(proizvodPostDTO == null){
+            return BadRequest();
+        }
+        var dodato = await _proizvodRepository.DodajProizvod(proizvodPostDTO);
+        
+        if(!dodato){
+            ModelState.AddModelError("","Greska");
+            return StatusCode(500,ModelState);
+        }
+        return Ok("Uspeh!");
+    }
+    [HttpPut]
+    public async Task<IActionResult> IzmeniProizvod(ProizvodPutDTO proizvodPutDTO){
+        if(!_proizvodRepository.ProizvodPostoji(proizvodPutDTO.Id)){
+            return NotFound();
+        }
+        var izmenaUspesna = await _proizvodRepository.IzmeniProizvod(proizvodPutDTO);
+        if(!izmenaUspesna){
+            ModelState.AddModelError("","Greska");
+            return StatusCode(500,ModelState);
+        }
+        return Ok("Uspeh!");
+    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> ObrisiProizvod(int id){
+        if(!_proizvodRepository.ProizvodPostoji(id)){
+            return NotFound();
+        }
+        var obrisano = await _proizvodRepository.ObrisiProizvod(id);
+        if(!obrisano){
+            ModelState.AddModelError("","Greska");
+            return StatusCode(500,ModelState);
+        }
+        return Ok("Uspeh!");
+    }
 }
